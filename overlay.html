@@ -12,197 +12,198 @@
             color: white; 
             overflow: hidden;
         }
-        .overlay-container { 
-            position: absolute; 
-            bottom: 30px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            width: 1100px; 
-            height: 100px; 
-            background: rgba(0, 0, 0, 0.85); 
-            border-radius: 10px; 
-            display: flex; 
-            align-items: center; 
-            padding: 0 20px; 
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        }
-        .section { 
-            padding: 0 15px; 
-            border-right: 1px solid rgba(255,255,255,0.2); 
-            height: 80%; 
-            display: flex; 
-            align-items: center;
+        
+        /* 右下角 - 比分、局數、BSO、壘包 */
+        .right-panel {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
             flex-direction: column;
-            justify-content: center;
+            gap: 4px;
         }
-        .section:last-child {
-            border-right: none;
-            flex-grow: 1;
-        }
-        .score-box { 
-            text-align: center; 
-        }
-        .score { 
-            font-size: 36px; 
-            font-weight: bold; 
-            background: white; 
-            color: black; 
-            padding: 0 10px; 
-            border-radius: 4px;
-            min-width: 50px;
-            display: inline-block;
-        }
-        .inning-display {
-            text-align: center;
-        }
-        .inning-num {
-            font-size: 28px;
+        
+        .scoreboard-top {
+            background: linear-gradient(to bottom, #e0b0ff, #b080d0);
+            padding: 4px 12px;
+            border-radius: 4px 4px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: #000;
             font-weight: bold;
         }
-        .inning-dir {
-            font-size: 20px;
-            display: block;
+        
+        .scoreboard-bottom {
+            background: #202080;
+            padding: 4px 12px;
+            border-radius: 0 0 4px 4px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
-        .bso-row { 
-            display: flex; 
-            gap: 5px; 
-            margin: 2px 0;
+        
+        .team-name {
+            font-size: 14px;
+        }
+        
+        .score-display {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .inning-small {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .base-diamond-small { 
+            position: relative; 
+            width: 50px; 
+            height: 50px; 
+        }
+        .base-small { 
+            position: absolute; 
+            width: 12px; 
+            height: 12px; 
+            border: 2px solid white; 
+            transform: rotate(45deg);
+            background: #333;
+            transition: all 0.2s;
+        }
+        .base-small.active { 
+            background: #ffaa00; 
+            border-color: #ffaa00;
+            box-shadow: 0 0 8px #ffaa00;
+        }
+        .base-small.b1 { right: 0; top: 19px; }
+        .base-small.b2 { left: 19px; top: 0; }
+        .base-small.b3 { left: 0; top: 19px; }
+        
+        .bso-small {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .lamp-group {
+            display: flex;
+            gap: 3px;
             align-items: center;
         }
-        .lamp { 
-            width: 14px; 
-            height: 14px; 
+        
+        .lamp-small { 
+            width: 10px; 
+            height: 10px; 
             border-radius: 50%; 
             background: #333;
             border: 1px solid #555;
         }
-        .lamp.b.active { background: #00ff00; border-color: #00ff00; box-shadow: 0 0 10px #00ff00; }
-        .lamp.s.active { background: #ffff00; border-color: #ffff00; box-shadow: 0 0 10px #ffff00; }
-        .lamp.o.active { background: #ff0000; border-color: #ff0000; box-shadow: 0 0 10px #ff0000; }
+        .lamp-small.b.active { background: #00ff00; border-color: #00ff00; }
+        .lamp-small.s.active { background: #ffff00; border-color: #ffff00; }
+        .lamp-small.o.active { background: #ff0000; border-color: #ff0000; }
         
-        .base-diamond { 
-            position: relative; 
-            width: 60px; 
-            height: 60px; 
+        /* 左下角 - 打者資訊 */
+        .left-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            min-width: 300px;
         }
-        .base { 
-            position: absolute; 
-            width: 16px; 
-            height: 16px; 
-            border: 2px solid white; 
-            transform: rotate(45deg);
-            background: #222;
-            transition: all 0.2s;
-        }
-        .base.active { 
-            background: #ffaa00; 
-            border-color: #ffaa00;
-            box-shadow: 0 0 12px #ffaa00;
-        }
-        .base.b1 { right: 0; top: 22px; }
-        .base.b2 { left: 22px; top: 0; }
-        .base.b3 { left: 0; top: 22px; }
         
-        .batter-info { 
-            flex-grow: 1; 
-            flex-direction: column; 
-            align-items: flex-start; 
-            justify-content: center;
-            padding-left: 20px;
-        }
         .batter-name {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
+        
         .batter-stats {
             display: flex;
-            gap: 15px;
-            font-size: 14px;
+            gap: 12px;
+            font-size: 13px;
             color: #ccc;
+            flex-wrap: wrap;
         }
+        
         .stat-item {
             display: flex;
             flex-direction: column;
             text-align: center;
         }
+        
         .stat-label {
-            font-size: 12px;
+            font-size: 11px;
             color: #888;
             margin-bottom: 2px;
         }
+        
         .at-bat-history {
             margin-top: 8px;
             display: flex;
-            gap: 6px;
+            gap: 5px;
             flex-wrap: wrap;
         }
+        
         .at-bat-tag {
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
             font-weight: 500;
             color: white;
         }
     </style>
 </head>
 <body>
-    <div class="overlay-container">
-        <!-- 我方比分 -->
-        <div class="section score-box">
-            <div style="font-size: 14px; margin-bottom: 4px; color: #aaa;">我方</div>
-            <div id="our-score" class="score">0</div>
+    <!-- 右下角 - 比分、局數、BSO、壘包 -->
+    <div class="right-panel">
+        <div class="scoreboard-top">
+            <span class="team-name" id="opponent-name">對手</span>
+            <span class="score-display" id="opp-score">0</span>
+            <span style="font-size: 18px;">-</span>
+            <span class="score-display" id="our-score">0</span>
+            <span class="team-name">我方</span>
         </div>
-        
-        <!-- 局數 -->
-        <div class="section inning-display">
-            <span id="inning-dir" class="inning-dir">▲</span>
-            <span id="inning-num" class="inning-num">1</span>
+        <div class="scoreboard-bottom">
+            <div class="inning-small">
+                <span id="inning-dir">▲</span>
+                <span id="inning-num" style="font-size: 18px; font-weight: bold;">1</span>
+            </div>
+            <div class="bso-small">
+                <div class="lamp-group">
+                    <span style="font-size: 12px;">B</span>
+                    <div id="b1" class="lamp-small b"></div>
+                    <div id="b2" class="lamp-small b"></div>
+                    <div id="b3" class="lamp-small b"></div>
+                </div>
+                <div class="lamp-group">
+                    <span style="font-size: 12px;">S</span>
+                    <div id="s1" class="lamp-small s"></div>
+                    <div id="s2" class="lamp-small s"></div>
+                </div>
+                <div class="lamp-group">
+                    <span style="font-size: 12px;">O</span>
+                    <div id="o1" class="lamp-small o"></div>
+                    <div id="o2" class="lamp-small o"></div>
+                </div>
+            </div>
+            <div class="base-diamond-small">
+                <div id="base1" class="base-small b1"></div>
+                <div id="base2" class="base-small b2"></div>
+                <div id="base3" class="base-small b3"></div>
+            </div>
         </div>
-        
-        <!-- 對手比分 -->
-        <div class="section score-box">
-            <div style="font-size: 14px; margin-bottom: 4px; color: #aaa;">對手</div>
-            <div id="opponent-name" style="font-size: 12px; margin-bottom: 2px; color: #fff;"></div>
-            <div id="opp-score" class="score">0</div>
-        </div>
+    </div>
 
-        <!-- BSO -->
-        <div class="section" style="flex-direction: column; justify-content: center;">
-            <div class="bso-row">
-                <span style="width: 30px;">B:</span>
-                <div id="b1" class="lamp b"></div>
-                <div id="b2" class="lamp b"></div>
-                <div id="b3" class="lamp b"></div>
-            </div>
-            <div class="bso-row">
-                <span style="width: 30px;">S:</span>
-                <div id="s1" class="lamp s"></div>
-                <div id="s2" class="lamp s"></div>
-            </div>
-            <div class="bso-row">
-                <span style="width: 30px;">O:</span>
-                <div id="o1" class="lamp o"></div>
-                <div id="o2" class="lamp o"></div>
-            </div>
-        </div>
-
-        <!-- 壘包 -->
-        <div class="section">
-            <div class="base-diamond">
-                <div id="base1" class="base b1"></div>
-                <div id="base2" class="base b2"></div>
-                <div id="base3" class="base b3"></div>
-            </div>
-        </div>
-
-        <!-- 打者資訊 -->
-        <div class="section batter-info">
-            <div id="curr-batter" class="batter-name">等待比賽開始...</div>
-            <div id="curr-stats" class="batter-stats"></div>
-            <div id="at-bat-history" class="at-bat-history"></div>
-        </div>
+    <!-- 左下角 - 打者資訊 -->
+    <div class="left-panel">
+        <div id="curr-batter" class="batter-name">等待比賽開始...</div>
+        <div id="curr-stats" class="batter-stats"></div>
+        <div id="at-bat-history" class="at-bat-history"></div>
     </div>
 
     <script>
