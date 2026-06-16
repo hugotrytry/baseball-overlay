@@ -235,7 +235,7 @@
     </div>
 
     <!-- 左下角 - 打者資訊 -->
-    <div class="batter-panel">
+    <div id="batter-panel" class="batter-panel">
         <div id="curr-batter" class="batter-name">等待比賽開始...</div>
         <div id="curr-stats" class="batter-stats"></div>
         <div id="at-bat-history" class="at-bat-history"></div>
@@ -314,24 +314,33 @@
                     }
                 }
 
-                // 取得打者快照
-                const { data: batters } = await client
-                    .from('live_batter_snapshot')
-                    .select('*')
-                    .order('updated_at', { ascending: false })
-                    .limit(1);
-                
-                const batter = batters && batters.length > 0 ? batters[0] : null;
-                
-                if (batter) {
-                    document.getElementById('curr-batter').innerText = (batter.batting_order || 0) + '棒 #' + (batter.number || 0) + ' ' + (batter.name || '');
-                    document.getElementById('curr-stats').innerHTML = 
-                        '<div class="stat-item"><span class="stat-label">打席</span><span class="stat-value">' + (batter.pa || 0) + '</span></div>' +
-                        '<div class="stat-item"><span class="stat-label">打數</span><span class="stat-value">' + (batter.ab || 0) + '</span></div>' +
-                        '<div class="stat-item"><span class="stat-label">安打</span><span class="stat-value">' + (batter.h || 0) + '</span></div>' +
-                        '<div class="stat-item"><span class="stat-label">打擊率</span><span class="stat-value">' + (batter.avg || '0.000') + '</span></div>' +
-                        '<div class="stat-item"><span class="stat-label">有效打擊</span><span class="stat-value">' + (batter.eh_rate || '0.000') + '</span></div>' +
-                        '<div class="stat-item"><span class="stat-label">盜壘</span><span class="stat-value">' + (batter.sb || 0) + '</span></div>';
+                // 檢查是否有打者，如果 current_batter_id 為 null，就清空打者資訊並隱藏框框
+                if (!state || !state.current_batter_id) {
+                    document.getElementById('batter-panel').style.display = 'none';
+                    document.getElementById('curr-batter').innerText = '';
+                    document.getElementById('curr-stats').innerHTML = '';
+                    document.getElementById('at-bat-history').innerHTML = '';
+                } else {
+                    document.getElementById('batter-panel').style.display = 'block';
+                    // 取得打者快照
+                    const { data: batters } = await client
+                        .from('live_batter_snapshot')
+                        .select('*')
+                        .order('updated_at', { ascending: false })
+                        .limit(1);
+                    
+                    const batter = batters && batters.length > 0 ? batters[0] : null;
+                    
+                    if (batter) {
+                        document.getElementById('curr-batter').innerText = (batter.batting_order || 0) + '棒 #' + (batter.number || 0) + ' ' + (batter.name || '');
+                        document.getElementById('curr-stats').innerHTML = 
+                            '<div class="stat-item"><span class="stat-label">打席</span><span class="stat-value">' + (batter.pa || 0) + '</span></div>' +
+                            '<div class="stat-item"><span class="stat-label">打數</span><span class="stat-value">' + (batter.ab || 0) + '</span></div>' +
+                            '<div class="stat-item"><span class="stat-label">安打</span><span class="stat-value">' + (batter.h || 0) + '</span></div>' +
+                            '<div class="stat-item"><span class="stat-label">打擊率</span><span class="stat-value">' + (batter.avg || '0.000') + '</span></div>' +
+                            '<div class="stat-item"><span class="stat-label">有效打擊</span><span class="stat-value">' + (batter.eh_rate || '0.000') + '</span></div>' +
+                            '<div class="stat-item"><span class="stat-label">盜壘</span><span class="stat-value">' + (batter.sb || 0) + '</span></div>';
+                    }
                 }
             } catch (e) {
                 console.error("更新失敗", e);
