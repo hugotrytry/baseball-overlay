@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>棒球直播 Overlay</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { 
+            margin: 0; 
+            background: transparent; 
+            font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; 
+            color: white; 
+            overflow: hidden;
+        }
+        .overlay-container { 
+            position: absolute; 
+            bottom: 30px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 1100px; 
+            height: 100px; 
+            background: rgba(0, 0, 0, 0.85); 
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            padding: 0 20px; 
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .section { 
+            padding: 0 15px; 
+            border-right: 1px solid rgba(255,255,255,0.2); 
+            height: 80%; 
+            display: flex; 
+            align-items: center;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .section:last-child {
+            border-right: none;
+            flex-grow: 1;
+        }
+        .score-box { 
+            text-align: center; 
+        }
+        .score { 
+            font-size: 36px; 
+            font-weight: bold; 
+            background: white; 
+            color: black; 
+            padding: 0 10px; 
+            border-radius: 4px;
+            min-width: 50px;
+            display: inline-block;
+        }
+        .inning-display {
+            text-align: center;
+        }
+        .inning-num {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .inning-dir {
+            font-size: 20px;
+            display: block;
+        }
+        .bso-row { 
+            display: flex; 
+            gap: 5px; 
+            margin: 2px 0;
+            align-items: center;
+        }
+        .lamp { 
+            width: 14px; 
+            height: 14px; 
+            border-radius: 50%; 
+            background: #333;
+            border: 1px solid #555;
+        }
+        .lamp.b.active { background: #00ff00; border-color: #00ff00; box-shadow: 0 0 10px #00ff00; }
+        .lamp.s.active { background: #ffff00; border-color: #ffff00; box-shadow: 0 0 10px #ffff00; }
+        .lamp.o.active { background: #ff0000; border-color: #ff0000; box-shadow: 0 0 10px #ff0000; }
+        
+        .base-diamond { 
+            position: relative; 
+            width: 60px; 
+            height: 60px; 
+        }
+        .base { 
+            position: absolute; 
+            width: 16px; 
+            height: 16px; 
+            border: 2px solid white; 
+            transform: rotate(45deg);
+            background: #222;
+            transition: all 0.2s;
+        }
+        .base.active { 
+            background: #ffaa00; 
+            border-color: #ffaa00;
+            box-shadow: 0 0 12px #ffaa00;
+        }
+        .base.b1 { right: 0; top: 22px; }
+        .base.b2 { left: 22px; top: 0; }
+        .base.b3 { left: 0; top: 22px; }
+        
+        .batter-info { 
+            flex-grow: 1; 
+            flex-direction: column; 
+            align-items: flex-start; 
+            justify-content: center;
+            padding-left: 20px;
+        }
+        .batter-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .batter-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+            color: #ccc;
+        }
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 2px;
+        }
+        .at-bat-history {
+            margin-top: 8px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .at-bat-tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay-container">
+        <!-- 我方比分 -->
+        <div class="section score-box">
+            <div style="font-size: 14px; margin-bottom: 4px; color: #aaa;">我方</div>
+            <div id="our-score" class="score">0</div>
+        </div>
+        
+        <!-- 局數 -->
+        <div class="section inning-display">
+            <span id="inning-dir" class="inning-dir">▲</span>
+            <span id="inning-num" class="inning-num">1</span>
+        </div>
+        
+        <!-- 對手比分 -->
+        <div class="section score-box">
+            <div style="font-size: 14px; margin-bottom: 4px; color: #aaa;">對手</div>
+            <div id="opponent-name" style="font-size: 12px; margin-bottom: 2px; color: #fff;"></div>
+            <div id="opp-score" class="score">0</div>
+        </div>
+
+        <!-- BSO -->
+        <div class="section" style="flex-direction: column; justify-content: center;">
+            <div class="bso-row">
+                <span style="width: 30px;">B:</span>
+                <div id="b1" class="lamp b"></div>
+                <div id="b2" class="lamp b"></div>
+                <div id="b3" class="lamp b"></div>
+            </div>
+            <div class="bso-row">
+                <span style="width: 30px;">S:</span>
+                <div id="s1" class="lamp s"></div>
+                <div id="s2" class="lamp s"></div>
+            </div>
+            <div class="bso-row">
+                <span style="width: 30px;">O:</span>
+                <div id="o1" class="lamp o"></div>
+                <div id="o2" class="lamp o"></div>
+            </div>
+        </div>
+
+        <!-- 壘包 -->
+        <div class="section">
+            <div class="base-diamond">
+                <div id="base1" class="base b1"></div>
+                <div id="base2" class="base b2"></div>
+                <div id="base3" class="base b3"></div>
+            </div>
+        </div>
+
+        <!-- 打者資訊 -->
+        <div class="section batter-info">
+            <div id="curr-batter" class="batter-name">等待比賽開始...</div>
+            <div id="curr-stats" class="batter-stats"></div>
+            <div id="at-bat-history" class="at-bat-history"></div>
+        </div>
+    </div>
+
+    <script>
+        // 你的 Supabase 資訊
+        const SUPABASE_URL = "https://jftoaptbakzwcvuionmk.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdG9hcHRiYWt6d2N2dWlvbm1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5NDkwODYsImV4cCI6MjA5MzUyNTA4Nn0.lt-dvJTg_9aUy61rpHMI5kKf5T9MbqMNiXfKaOhNgoE";
+        
+        let client;
+
+        try {
+            client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        } catch (e) {
+            console.error("Supabase 初始化失敗", e);
+        }
+
+        function getResultColor(result) {
+            const hits = ['一安', '二安', '三安', '全壘', '內安'];
+            const outs = ['滾', '飛', '內飛', '雙殺', '三振', '犧失敗', '盜失敗'];
+            if (hits.includes(result)) return '#ff6b6b';
+            if (outs.includes(result)) return '#4ecdc4';
+            return '#95a5a6';
+        }
+
+        async function refresh() {
+            if (!client) return;
+            
+            try {
+                // 取得遊戲狀態
+                const { data: states } = await client
+                    .from('live_game_state')
+                    .select('*')
+                    .order('updated_at', { ascending: false })
+                    .limit(1);
+                    
+                const state = states && states.length > 0 ? states[0] : null;
+                
+                if (state) {
+                    document.getElementById('our-score').innerText = state.our_score || 0;
+                    document.getElementById('opp-score').innerText = state.opponent_score || 0;
+                    document.getElementById('opponent-name').innerText = state.opponent_name || '';
+                    document.getElementById('inning-num').innerText = state.inning || 1;
+                    document.getElementById('inning-dir').innerText = state.is_top_inning ? '▲' : '▼';
+                    
+                    // 更新 BSO
+                    for(let i=1;i<=3;i++) {
+                        document.getElementById('b'+i).classList.toggle('active', (state.balls || 0) >= i);
+                    }
+                    for(let i=1;i<=2;i++) {
+                        document.getElementById('s'+i).classList.toggle('active', (state.strikes || 0) >= i);
+                        document.getElementById('o'+i).classList.toggle('active', (state.outs || 0) >= i);
+                    }
+                    
+                    // 更新壘包
+                    document.getElementById('base1').classList.toggle('active', state.is_first_base_occupied || false);
+                    document.getElementById('base2').classList.toggle('active', state.is_second_base_occupied || false);
+                    document.getElementById('base3').classList.toggle('active', state.is_third_base_occupied || false);
+                    
+                    // 顯示打席歷史
+                    if (state.current_batter_at_bat_history) {
+                        const historyArray = state.current_batter_at_bat_history.split(',');
+                        const historyHtml = historyArray.map(h => 
+                            `<span class="at-bat-tag" style="background-color: ${getResultColor(h)}">${h}</span>`
+                        ).join('');
+                        document.getElementById('at-bat-history').innerHTML = historyHtml;
+                    } else {
+                        document.getElementById('at-bat-history').innerHTML = '';
+                    }
+                }
+
+                // 取得打者快照
+                const { data: batters } = await client
+                    .from('live_batter_snapshot')
+                    .select('*')
+                    .order('updated_at', { ascending: false })
+                    .limit(1);
+                    
+                const batter = batters && batters.length > 0 ? batters[0] : null;
+                    
+                if (batter) {
+                    document.getElementById('curr-batter').innerText = (batter.batting_order || 0) + '棒 #' + (batter.number || 0) + ' ' + (batter.name || '');
+                    document.getElementById('curr-stats').innerHTML = `
+                        <div class="stat-item"><span class="stat-label">打席</span><span>${batter.pa || 0}</span></div>
+                        <div class="stat-item"><span class="stat-label">打數</span><span>${batter.ab || 0}</span></div>
+                        <div class="stat-item"><span class="stat-label">安打</span><span>${batter.h || 0}</span></div>
+                        <div class="stat-item"><span class="stat-label">打擊率</span><span>${batter.avg || '0.000'}</span></div>
+                        <div class="stat-item"><span class="stat-label">有效打擊</span><span>${batter.eh_rate || '0.000'}</span></div>
+                        <div class="stat-item"><span class="stat-label">盜壘</span><span>${batter.sb || 0}</span></div>
+                    `;
+                }
+            } catch (e) {
+                console.error("更新失敗", e);
+            }
+        }
+
+        // 初始載入
+        if (client) {
+            refresh();
+            
+            // 每 1 秒強制更新一次
+            setInterval(refresh, 1000);
+        }
+    </script>
+</body>
+</html>
