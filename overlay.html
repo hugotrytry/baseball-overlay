@@ -13,236 +13,211 @@
             overflow: hidden;
         }
         
-        /* 右下角 - 比分、局數、BSO、壘包 */
+        /* ==================== 記分板 ==================== */
         .scoreboard {
             position: absolute;
             bottom: 20px;
             right: 20px;
+            background: rgba(0, 0, 0, 0.88);
+            border-radius: 10px;
+            padding: 10px 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.7);
             display: flex;
             flex-direction: column;
+            gap: 8px;
+            min-width: 420px;
         }
-        
-        .score-row {
-            display: flex;
-        }
-        
-        .team-block {
-            padding: 5px 15px;
+
+        /* 目前打者列 */
+        .current-batter-bar {
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 6px 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            font-size: 15px;
+        }
+
+        .batter-info {
             font-weight: bold;
         }
-        
-        .team-away {
-            background: #e898d8;
-            color: #000;
-            border-radius: 4px 0 0 0;
+
+        .at-bat-history {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
         }
-        
-        .team-home {
-            background: #3050b0;
-            color: #fff;
-            border-radius: 0 0 0 4px;
+
+        .at-bat-tag {
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
         }
-        
-        .team-name {
-            font-size: 16px;
-        }
-        
-        .score-num {
-            font-size: 24px;
-        }
-        
-        .status-panel {
-            background: #111;
-            border-radius: 0 4px 4px 0;
-            padding: 5px 10px;
+
+        /* 球隊比分 */
+        .teams {
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            gap: 6px;
         }
-        
-        .status-top {
+
+        .team-row {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: bold;
         }
-        
+
+        .team-away {
+            background: linear-gradient(90deg, #e898d8, #d46bc4);
+            color: #000;
+        }
+
+        .team-home {
+            background: linear-gradient(90deg, #3050b0, #1e3a8a);
+            color: #fff;
+        }
+
+        .team-name {
+            font-size: 15px;
+            min-width: 110px;
+        }
+
+        .score-num {
+            font-size: 28px;
+            font-weight: 900;
+            min-width: 36px;
+            text-align: center;
+        }
+
+        .status-panel {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #111;
+            border-radius: 6px;
+            padding: 8px 14px;
+        }
+
         .inning-display {
             display: flex;
             align-items: center;
-            gap: 5px;
-            font-size: 18px;
+            gap: 8px;
+            font-size: 21px;
             font-weight: bold;
         }
-        
-        /* 左下角 - 打者資訊 */
-        .batter-panel {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(0, 0, 0, 0.85);
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 10px 15px;
-            min-width: 280px;
-        }
-        
-        .batter-name {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 6px;
-        }
-        
-        .batter-stats {
-            display: flex;
-            gap: 10px;
-            font-size: 12px;
-            color: #ccc;
-            flex-wrap: wrap;
-        }
-        
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            text-align: center;
-        }
-        
-        .stat-label {
-            font-size: 10px;
-            color: #888;
-            margin-bottom: 2px;
-        }
-        
-        .stat-value {
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .at-bat-history {
-            margin-top: 8px;
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-        }
-        
-        .at-bat-tag {
-            padding: 1px 6px;
-            border-radius: 3px;
-            font-size: 11px;
-            font-weight: 500;
-            color: white;
-        }
-        
-        /* 壘包指示 */
+
+        /* 壘包 */
         .base-diamond { 
             position: relative; 
-            width: 45px; 
-            height: 45px; 
-            display: inline-block;
-            vertical-align: middle;
+            width: 50px; 
+            height: 50px; 
         }
         .base { 
             position: absolute; 
-            width: 10px; 
-            height: 10px; 
-            border: 2px solid #666; 
+            width: 12px; 
+            height: 12px; 
+            border: 2px solid #777; 
             transform: rotate(45deg);
-            background: #333;
-            transition: all 0.2s;
+            background: #222;
+            transition: all 0.3s;
         }
         .base.active { 
-            background: #ffaa00; 
-            border-color: #ffaa00;
-            box-shadow: 0 0 8px #ffaa00;
+            background: #ffdd57; 
+            border-color: #ffdd57;
+            box-shadow: 0 0 10px #ffdd57;
         }
-        .base.b1 { right: 0; top: 17px; }
-        .base.b2 { left: 17px; top: 0; }
-        .base.b3 { left: 0; top: 17px; }
-        
-        /* BSO 指示 */
+        .base.b1 { right: 3px; top: 19px; }
+        .base.b2 { left: 19px; top: 3px; }
+        .base.b3 { left: 3px; top: 19px; }
+
+        /* BSO */
         .bso-indicators {
             display: flex;
-            gap: 8px;
+            gap: 14px;
+        }
+        .bso-group {
+            display: flex;
             align-items: center;
-            margin-top: 5px;
+            gap: 4px;
         }
         .bso-label {
+            font-size: 13px;
             font-weight: bold;
-            font-size: 14px;
         }
         .lamp {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            background: #444;
-            margin: 0 2px;
+            background: #333;
             border: 1px solid #555;
         }
-        .lamp.b.active { background: #00ff00; border-color: #00ff00; }
-        .lamp.s.active { background: #ffff00; border-color: #ffff00; }
-        .lamp.o.active { background: #ff0000; border-color: #ff0000; }
+        .lamp.b.active { background: #22ff44; box-shadow: 0 0 6px #22ff44; }
+        .lamp.s.active { background: #ffdd00; box-shadow: 0 0 6px #ffdd00; }
+        .lamp.o.active { background: #ff4444; box-shadow: 0 0 6px #ff4444; }
     </style>
 </head>
 <body>
-    <!-- 右下角 - 比分板 -->
+    <!-- 右下角記分板 -->
     <div class="scoreboard">
-        <div class="score-row">
-            <div class="team-block team-away">
-                <span class="team-name" id="away-team-name">對手</span>
-                <span class="score-num" id="away-score">0</span>
+        <!-- 目前打者資訊 -->
+        <div id="current-batter-bar" class="current-batter-bar" style="display: none;">
+            <span id="curr-batter" class="batter-info"></span>
+            <div id="at-bat-history" class="at-bat-history"></div>
+        </div>
+
+        <!-- 球隊比分 -->
+        <div class="teams">
+            <div class="team-row team-away">
+                <span class="team-name" id="away-team-name">錦興國小</span>
+                <span class="score-num" id="away-score">1</span>
             </div>
-            <div class="status-panel">
-                <div class="status-top">
-                    <span id="inning-dir" style="font-size: 16px;">▲</span>
-                    <span id="inning-num" style="font-size: 20px; font-weight: bold;">1</span>
-                </div>
+            <div class="team-row team-home">
+                <span class="team-name" id="home-team-name">龍安國小</span>
+                <span class="score-num" id="home-score">4</span>
             </div>
         </div>
-        <div class="score-row">
-            <div class="team-block team-home">
-                <span class="team-name" id="home-team-name">龍安國小</span>
-                <span class="score-num" id="home-score">0</span>
+
+        <!-- 狀態面板 -->
+        <div class="status-panel">
+            <div class="inning-display">
+                <span id="inning-dir">▲</span>
+                <span id="inning-num">1</span>
             </div>
-            <div class="status-panel">
-                <div class="base-diamond">
-                    <div id="base1" class="base b1"></div>
-                    <div id="base2" class="base b2"></div>
-                    <div id="base3" class="base b3"></div>
+
+            <div class="base-diamond">
+                <div id="base1" class="base b1"></div>
+                <div id="base2" class="base b2"></div>
+                <div id="base3" class="base b3"></div>
+            </div>
+
+            <div class="bso-indicators">
+                <div class="bso-group">
+                    <span class="bso-label">B</span>
+                    <span id="b1" class="lamp b"></span>
+                    <span id="b2" class="lamp b"></span>
+                    <span id="b3" class="lamp b"></span>
                 </div>
-                <div class="bso-indicators">
-                    <div style="display: flex; align-items: center; gap: 5px;">
-                        <span class="bso-label">B</span>
-                        <span id="b1" class="lamp b"></span>
-                        <span id="b2" class="lamp b"></span>
-                        <span id="b3" class="lamp b"></span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 5px;">
-                        <span class="bso-label">S</span>
-                        <span id="s1" class="lamp s"></span>
-                        <span id="s2" class="lamp s"></span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 5px;">
-                        <span class="bso-label">O</span>
-                        <span id="o1" class="lamp o"></span>
-                        <span id="o2" class="lamp o"></span>
-                    </div>
+                <div class="bso-group">
+                    <span class="bso-label">S</span>
+                    <span id="s1" class="lamp s"></span>
+                    <span id="s2" class="lamp s"></span>
+                </div>
+                <div class="bso-group">
+                    <span class="bso-label">O</span>
+                    <span id="o1" class="lamp o"></span>
+                    <span id="o2" class="lamp o"></span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- 左下角 - 打者資訊 -->
-    <div id="batter-panel" class="batter-panel">
-        <div id="curr-batter" class="batter-name">等待比賽開始...</div>
-        <div id="curr-stats" class="batter-stats"></div>
-        <div id="at-bat-history" class="at-bat-history"></div>
-    </div>
-    
     <script>
-        // 你的 Supabase 資訊
         const SUPABASE_URL = "https://jftoaptbakzwcvuionmk.supabase.co";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdG9hcHRiYWt6d2N2dWlvbm1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5NDkwODYsImV4cCI6MjA5MzUyNTA4Nn0.lt-dvJTg_9aUy61rpHMI5kKf5T9MbqMNiXfKaOhNgoE";
         
@@ -266,7 +241,6 @@
             if (!client) return;
             
             try {
-                // 取得遊戲狀態
                 const { data: states } = await client
                     .from('live_game_state')
                     .select('*')
@@ -276,70 +250,56 @@
                 const state = states && states.length > 0 ? states[0] : null;
                 
                 if (state) {
-                    const homeTeamName = state.home_team_name || "龍安國小";
-                    const awayTeamName = state.away_team_name || state.opponent_name || "對手";
-                    
-                    // 直接顯示：客隊在上，主隊在下
-                    document.getElementById('home-team-name').innerText = homeTeamName;
+                    // 隊名與比分
+                    document.getElementById('home-team-name').innerText = state.home_team_name || "龍安國小";
                     document.getElementById('home-score').innerText = state.our_score || 0;
-                    document.getElementById('away-team-name').innerText = awayTeamName;
+                    document.getElementById('away-team-name').innerText = state.away_team_name || state.opponent_name || "對手";
                     document.getElementById('away-score').innerText = state.opponent_score || 0;
-                    
+
+                    // 局數
                     document.getElementById('inning-num').innerText = state.inning || 1;
                     document.getElementById('inning-dir').innerText = state.is_top_inning ? '▲' : '▼';
-                    
-                    // 更新 BSO
-                    for(let i=1;i<=3;i++) {
-                        document.getElementById('b'+i).classList.toggle('active', (state.balls || 0) >= i);
-                    }
+
+                    // BSO
+                    for(let i=1;i<=3;i++) document.getElementById('b'+i).classList.toggle('active', (state.balls || 0) >= i);
                     for(let i=1;i<=2;i++) {
                         document.getElementById('s'+i).classList.toggle('active', (state.strikes || 0) >= i);
                         document.getElementById('o'+i).classList.toggle('active', (state.outs || 0) >= i);
                     }
-                    
-                    // 更新壘包
+
+                    // 壘包
                     document.getElementById('base1').classList.toggle('active', state.is_first_base_occupied || false);
                     document.getElementById('base2').classList.toggle('active', state.is_second_base_occupied || false);
                     document.getElementById('base3').classList.toggle('active', state.is_third_base_occupied || false);
-                    
-                    // 顯示打席歷史
-                    if (state.current_batter_at_bat_history) {
-                        const historyArray = state.current_batter_at_bat_history.split(',');
-                        const historyHtml = historyArray.map(h => 
-                            `<span class="at-bat-tag" style="background-color: ${getResultColor(h)}">${h}</span>`
-                        ).join('');
-                        document.getElementById('at-bat-history').innerHTML = historyHtml;
-                    } else {
-                        document.getElementById('at-bat-history').innerHTML = '';
-                    }
-                }
 
-                // 檢查是否有打者，如果 current_batter_id 為 null，就清空打者資訊並隱藏框框
-                if (!state || !state.current_batter_id) {
-                    document.getElementById('batter-panel').style.display = 'none';
-                    document.getElementById('curr-batter').innerText = '';
-                    document.getElementById('curr-stats').innerHTML = '';
-                    document.getElementById('at-bat-history').innerHTML = '';
-                } else {
-                    document.getElementById('batter-panel').style.display = 'block';
-                    // 取得打者快照
-                    const { data: batters } = await client
-                        .from('live_batter_snapshot')
-                        .select('*')
-                        .order('updated_at', { ascending: false })
-                        .limit(1);
+                    // ==================== 新增：目前打者 ====================
+                    const batterBar = document.getElementById('current-batter-bar');
                     
-                    const batter = batters && batters.length > 0 ? batters[0] : null;
-                    
-                    if (batter) {
-                        document.getElementById('curr-batter').innerText = (batter.batting_order || 0) + '棒 #' + (batter.number || 0) + ' ' + (batter.name || '');
-                        document.getElementById('curr-stats').innerHTML = 
-                            '<div class="stat-item"><span class="stat-label">打席</span><span class="stat-value">' + (batter.pa || 0) + '</span></div>' +
-                            '<div class="stat-item"><span class="stat-label">打數</span><span class="stat-value">' + (batter.ab || 0) + '</span></div>' +
-                            '<div class="stat-item"><span class="stat-label">安打</span><span class="stat-value">' + (batter.h || 0) + '</span></div>' +
-                            '<div class="stat-item"><span class="stat-label">打擊率</span><span class="stat-value">' + (batter.avg || '0.000') + '</span></div>' +
-                            '<div class="stat-item"><span class="stat-label">有效打擊</span><span class="stat-value">' + (batter.eh_rate || '0.000') + '</span></div>' +
-                            '<div class="stat-item"><span class="stat-label">盜壘</span><span class="stat-value">' + (batter.sb || 0) + '</span></div>';
+                    if (state.current_batter_id) {
+                        const { data: batters } = await client
+                            .from('live_batter_snapshot')
+                            .select('*')
+                            .order('updated_at', { ascending: false })
+                            .limit(1);
+                        
+                        const batter = batters && batters.length > 0 ? batters[0] : null;
+                        
+                        if (batter) {
+                            const batterText = `${batter.batting_order || ''}棒 #${batter.number || ''} ${batter.name || ''}`;
+                            document.getElementById('curr-batter').innerText = batterText;
+
+                            // 打席歷史
+                            if (state.current_batter_at_bat_history) {
+                                const historyArray = state.current_batter_at_bat_history.split(',');
+                                const historyHtml = historyArray.map(h => 
+                                    `<span class="at-bat-tag" style="background-color: ${getResultColor(h)}">${h}</span>`
+                                ).join('');
+                                document.getElementById('at-bat-history').innerHTML = historyHtml;
+                            }
+                            batterBar.style.display = 'flex';
+                        }
+                    } else {
+                        batterBar.style.display = 'none';
                     }
                 }
             } catch (e) {
@@ -347,11 +307,8 @@
             }
         }
 
-        // 初始載入
         if (client) {
             refresh();
-            
-            // 每 1 秒強制更新一次
             setInterval(refresh, 1000);
         }
     </script>
