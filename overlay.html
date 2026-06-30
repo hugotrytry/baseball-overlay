@@ -231,9 +231,16 @@
 
         function getResultColor(result) {
             const hits = ['一安', '二安', '三安', '全壘', '內安'];
-            const outs = ['滾', '飛', '內飛', '雙殺', '三振', '犧失敗', '盜失敗'];
+            const outs = ['滾', '飛', '內飛', '雙殺', '三振', '犧失敗'];
+            const free = ['四壘', '保送', '觸身'];
+            const sacrifice = ['犧飛', '犧觸'];
+            const other = ['選', '失誤上壘'];
+            
             if (hits.includes(result)) return '#ff6b6b';
             if (outs.includes(result)) return '#4ecdc4';
+            if (free.includes(result)) return '#feca57';
+            if (sacrifice.includes(result)) return '#48dbfb';
+            if (other.includes(result)) return '#ff9ff3';
             return '#95a5a6';
         }
 
@@ -274,8 +281,22 @@
 
                     // ==================== 新增：目前打者 ====================
                     const batterBar = document.getElementById('current-batter-bar');
+                    const historyContainer = document.getElementById('at-bat-history');
                     
-                    if (state.current_batter_id) {
+                    // 記錄上一次的歷史內容，避免重複更新導致閃爍
+                    let lastHistory = historyContainer.dataset.lastHistory || '';
+                    
+                    // 判斷是否是我們進攻
+                    const isHomeTeam = state.is_home_team !== undefined ? state.is_home_team : true;
+                    const isOurOffense = isHomeTeam ? !state.is_top_inning : state.is_top_inning;
+                    
+                    console.log('進攻狀態判斷:', {
+                        isHomeTeam: isHomeTeam,
+                        isTopInning: state.is_top_inning,
+                        isOurOffense: isOurOffense
+                    });
+                    
+                    if (state.current_batter_id && isOurOffense) {
                         const { data: batters } = await client
                             .from('live_batter_snapshot')
                             .select('*')
@@ -284,22 +305,42 @@
                         
                         const batter = batters && batters.length > 0 ? batters[0] : null;
                         
+                        console.log('Overlay 更新:', { 
+                            batterId: state.current_batter_id, 
+                            history: state.current_batter_at_bat_history, 
+                            batterData: batter 
+                        });
+                        
                         if (batter) {
                             const batterText = `${batter.batting_order || ''}棒 #${batter.number || ''} ${batter.name || ''}`;
                             document.getElementById('curr-batter').innerText = batterText;
 
-                            // 打席歷史
-                            if (state.current_batter_at_bat_history) {
-                                const historyArray = state.current_batter_at_bat_history.split(',');
-                                const historyHtml = historyArray.map(h => 
-                                    `<span class="at-bat-tag" style="background-color: ${getResultColor(h)}">${h}</span>`
-                                ).join('');
-                                document.getElementById('at-bat-history').innerHTML = historyHtml;
+                            // 打席歷史 - 只有當內容真的改變時才更新，避免閃爍！
+                            const currentHistory = state.current_batter_at_bat_history || '';
+                            if (currentHistory !== lastHistory) {
+                                // 每次更新前先清空，避免殘留
+                                historyContainer.innerHTML = '';
+                                if (currentHistory) {
+                                    const historyArray = currentHistory.split(',');
+                                    const historyHtml = historyArray.map(h => 
+                                        `<span class="at-bat-tag" style="background-color: ${getResultColor(h)}">${h}</span>`
+                                    ).join('');
+                                    historyContainer.innerHTML = historyHtml;
+                                }
+                                // 記錄這次的內容
+                                historyContainer.dataset.lastHistory = currentHistory;
+                                lastHistory = currentHistory;
                             }
                             batterBar.style.display = 'flex';
                         }
                     } else {
                         batterBar.style.display = 'none';
+                        // 清空並記錄
+                        if (lastHistory !== '') {
+                            historyContainer.innerHTML = '';
+                            historyContainer.dataset.lastHistory = '';
+                            lastHistory = '';
+                        }
                     }
                 }
             } catch (e) {
