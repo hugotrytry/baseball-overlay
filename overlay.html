@@ -11,12 +11,13 @@
             font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; 
             color: white; 
             overflow: hidden;
+            display: inline-block;
+        }
+        html {
+            background: transparent;
         }
         
         .scoreboard {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
             background: rgba(0, 0, 0, 0.88);
             border-radius: 11px;
             padding: 11px 18px;
@@ -25,6 +26,7 @@
             flex-direction: column;
             gap: 9px;
             min-width: 346px;
+            width: fit-content;
         }
 
         /* 目前打者列 */
@@ -65,7 +67,8 @@
         .team-row {
             display: flex;
             align-items: center;
-            gap: 10px;
+            justify-content: flex-start;
+            gap: 14px;
             padding: 5px 12px;
             border-radius: 6px;
             font-weight: bold;
@@ -83,7 +86,7 @@
             font-size: 26px;
             font-weight: 900;
             min-width: 32px;
-            text-align: center;
+            text-align: left;
         }
 
         /* 壘包 + 局數：垂直排列，整體置中 */
@@ -131,7 +134,7 @@
             line-height: 1;
         }
 
-        /* 狀態面板：只剩 BSO */
+        /* 狀態面板：下一位打者 + BSO */
         .status-panel {
             display: flex;
             align-items: center;
@@ -140,6 +143,16 @@
             border-radius: 6px;
             padding: 8px 14px;
         }
+        .next-batter-panel {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            padding-right: 14px;
+            border-right: 1px solid #444;
+        }
+        .next-batter-panel .label { color: #999; font-weight: normal; }
         .bso-indicators { display: flex; gap: 14px; }
         .bso-group { display: flex; align-items: center; gap: 4px; }
         .bso-label { font-size: 13px; font-weight: bold; }
@@ -161,7 +174,6 @@
             <span id="curr-batter" class="batter-info"></span>
             <div id="at-bat-history" class="at-bat-history"></div>
         </div>
-
         <!-- 球隊比分 + 壘包/局數 -->
         <div class="teams-with-bases">
             <div class="teams">
@@ -191,6 +203,10 @@
 
         <!-- 狀態面板：BSO only -->
         <div class="status-panel">
+            <div id="next-batter" class="next-batter-panel" style="display: none;">
+                <span class="label">Next</span>
+                <span id="next-batter-info"></span>
+            </div>
             <div class="bso-indicators">
                 <div class="bso-group">
                     <span class="bso-label">B</span>
@@ -272,31 +288,47 @@
                     const isOurOffense = isHomeTeam ? !state.is_top_inning : state.is_top_inning;
 
                     if (state.current_batter_id && isOurOffense) {
-                        const { data: batters } = await client
-                            .from('live_batter_snapshot')
-                            .select('*')
-                            .order('updated_at', { ascending: false })
-                            .limit(1);
-                        
-                        const batter = batters && batters.length > 0 ? batters[0] : null;
-                        if (batter) {
-                            document.getElementById('curr-batter').innerText =
-                                `${batter.batting_order || ''}棒 #${batter.number || ''} ${batter.name || ''}`;
+                        // 使用 live_game_state 中已經存好的球員資訊
+                        let batterText = '';
+                        if (state.current_batter_order) {
+                            batterText = `${state.current_batter_order}棒`;
+                        }
+                        if (state.current_batter_number && state.current_batter_name) {
+                            batterText += ` #${state.current_batter_number} ${state.current_batter_name}`;
+                        } else if (state.current_batter_name) {
+                            batterText += ` ${state.current_batter_name}`;
+                        }
+                        document.getElementById('curr-batter').innerText = batterText;
 
-                            const currentHistory = state.current_batter_at_bat_history || '';
-                            if (currentHistory !== lastHistory) {
-                                historyContainer.innerHTML = '';
-                                if (currentHistory) {
-                                    historyContainer.innerHTML = currentHistory.split(',').map(h =>
-                                        `<span class="at-bat-tag" style="background-color:${getResultColor(h)}">${h}</span>`
-                                    ).join('');
-                                }
-                                historyContainer.dataset.lastHistory = currentHistory;
+                        const currentHistory = state.current_batter_at_bat_history || '';
+                        if (currentHistory !== lastHistory) {
+                            historyContainer.innerHTML = '';
+                            if (currentHistory) {
+                                historyContainer.innerHTML = currentHistory.split(',').map(h =>
+                                    `<span class="at-bat-tag" style="background-color:${getResultColor(h)}">${h}</span>`
+                                ).join('');
                             }
-                            batterBar.style.display = 'flex';
+                            historyContainer.dataset.lastHistory = currentHistory;
+                        }
+                        batterBar.style.display = 'flex';
+                        
+                        // 顯示下一位打者
+                        const nextBatterDiv = document.getElementById('next-batter');
+                        const nextBatterInfo = document.getElementById('next-batter-info');
+                        if (state.next_batter_name) {
+                            let nextText = '';
+                            if (state.next_batter_number) {
+                                nextText += `#${state.next_batter_number} `;
+                            }
+                            nextText += state.next_batter_name;
+                            nextBatterInfo.innerText = nextText;
+                            nextBatterDiv.style.display = 'flex';
+                        } else {
+                            nextBatterDiv.style.display = 'none';
                         }
                     } else {
                         batterBar.style.display = 'none';
+                        document.getElementById('next-batter').style.display = 'none';
                         if (lastHistory !== '') {
                             historyContainer.innerHTML = '';
                             historyContainer.dataset.lastHistory = '';
