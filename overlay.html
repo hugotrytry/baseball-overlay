@@ -12,6 +12,9 @@
             color: white; 
             overflow: hidden;
             display: inline-block;
+            -webkit-font-smoothing: antialiased;
+            image-rendering: -webkit-optimize-contrast;
+            transform: translateZ(0);
         }
         html {
             background: transparent;
@@ -20,13 +23,15 @@
         .scoreboard {
             background: rgba(0, 0, 0, 0.88);
             border-radius: 11px;
-            padding: 11px 18px;
+            padding: 12px 20px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.7);
             display: flex;
             flex-direction: column;
             gap: 9px;
-            min-width: 346px;
-            width: fit-content;
+            width: 380px;           /* 固定寬度，減少縮放模糊 */
+            min-width: 380px;
+            max-width: 420px;
+            transform: scale(1);
         }
 
         /* 目前打者列 */
@@ -49,7 +54,7 @@
             color: white;
         }
 
-        /* 球隊比分 + 壘包+局數 並排 */
+        /* 球隊比分 + 壘包+局數 */
         .teams-with-bases {
             display: flex;
             flex-direction: row;
@@ -89,7 +94,6 @@
             text-align: left;
         }
 
-        /* 壘包 + 局數：垂直排列，整體置中 */
         .base-and-inning {
             display: flex;
             flex-direction: column;
@@ -123,7 +127,6 @@
         .base.b2 { left: 23px; top: 2px;  }
         .base.b3 { left: 2px;  top: 23px; }
 
-        /* 局數顯示 — 壘包正下方 */
         .inning-display {
             display: flex;
             align-items: center;
@@ -134,7 +137,6 @@
             line-height: 1;
         }
 
-        /* 狀態面板：下一位打者 + BSO */
         .status-panel {
             display: flex;
             align-items: center;
@@ -174,6 +176,7 @@
             <span id="curr-batter" class="batter-info"></span>
             <div id="at-bat-history" class="at-bat-history"></div>
         </div>
+
         <!-- 球隊比分 + 壘包/局數 -->
         <div class="teams-with-bases">
             <div class="teams">
@@ -187,7 +190,6 @@
                 </div>
             </div>
 
-            <!-- 壘包在上，局數在下 -->
             <div class="base-and-inning">
                 <div class="base-diamond">
                     <div id="base1" class="base b1"></div>
@@ -201,7 +203,7 @@
             </div>
         </div>
 
-        <!-- 狀態面板：BSO only -->
+        <!-- 狀態面板：BSO -->
         <div class="status-panel">
             <div id="next-batter" class="next-batter-panel" style="display: none;">
                 <span class="label">Next</span>
@@ -288,11 +290,8 @@
                     const isOurOffense = isHomeTeam ? !state.is_top_inning : state.is_top_inning;
 
                     if (state.current_batter_id && isOurOffense) {
-                        // 使用 live_game_state 中已經存好的球員資訊
                         let batterText = '';
-                        if (state.current_batter_order) {
-                            batterText = `${state.current_batter_order}棒`;
-                        }
+                        if (state.current_batter_order) batterText = `${state.current_batter_order}棒`;
                         if (state.current_batter_number && state.current_batter_name) {
                             batterText += ` #${state.current_batter_number} ${state.current_batter_name}`;
                         } else if (state.current_batter_name) {
@@ -312,14 +311,11 @@
                         }
                         batterBar.style.display = 'flex';
                         
-                        // 顯示下一位打者
                         const nextBatterDiv = document.getElementById('next-batter');
                         const nextBatterInfo = document.getElementById('next-batter-info');
                         if (state.next_batter_name) {
                             let nextText = '';
-                            if (state.next_batter_number) {
-                                nextText += `#${state.next_batter_number} `;
-                            }
+                            if (state.next_batter_number) nextText += `#${state.next_batter_number} `;
                             nextText += state.next_batter_name;
                             nextBatterInfo.innerText = nextText;
                             nextBatterDiv.style.display = 'flex';
