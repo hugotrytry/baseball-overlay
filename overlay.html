@@ -16,9 +16,7 @@
             image-rendering: -webkit-optimize-contrast;
             transform: translateZ(0);
         }
-        html {
-            background: transparent;
-        }
+        html { background: transparent; }
         
         .scoreboard {
             background: rgba(0, 0, 0, 0.88);
@@ -28,9 +26,9 @@
             display: flex;
             flex-direction: column;
             gap: 9px;
-            width: 380px;           /* 固定寬度，減少縮放模糊 */
-            min-width: 380px;
-            max-width: 420px;
+            width: 390px;
+            min-width: 390px;
+            max-width: 430px;
             transform: scale(1);
         }
 
@@ -54,7 +52,7 @@
             color: white;
         }
 
-        /* 球隊比分 + 壘包+局數 */
+        /* 球隊比分區 */
         .teams-with-bases {
             display: flex;
             flex-direction: row;
@@ -72,9 +70,8 @@
         .team-row {
             display: flex;
             align-items: center;
-            justify-content: flex-start;
-            gap: 14px;
-            padding: 5px 12px;
+            justify-content: space-between;   /* 改成 space-between 讓分數靠右 */
+            padding: 5px 32px;
             border-radius: 6px;
             font-weight: bold;
         }
@@ -86,14 +83,19 @@
             background: linear-gradient(90deg, #3050b0, #1e3a8a);
             color: #fff;
         }
-        .team-name { font-size: 14px; min-width: 85px; }
+        .team-name { 
+            font-size: 22px;        /* 加大隊名 */
+            font-weight: bold;
+            min-width: 90px;
+        }
         .score-num {
-            font-size: 26px;
+            font-size: 28px;        /* 分數也稍微加大 */
             font-weight: 900;
-            min-width: 32px;
-            text-align: left;
+            text-align: right;
+            min-width: 40px;
         }
 
+        /* 壘包 + 局數 */
         .base-and-inning {
             display: flex;
             flex-direction: column;
@@ -190,6 +192,7 @@
                 </div>
             </div>
 
+            <!-- 壘包 + 局數 -->
             <div class="base-and-inning">
                 <div class="base-diamond">
                     <div id="base1" class="base b1"></div>
@@ -203,7 +206,7 @@
             </div>
         </div>
 
-        <!-- 狀態面板：BSO -->
+        <!-- 狀態面板 -->
         <div class="status-panel">
             <div id="next-batter" class="next-batter-panel" style="display: none;">
                 <span class="label">Next</span>
